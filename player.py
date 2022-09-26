@@ -2,18 +2,19 @@ import os
 from enum import Enum
 import hexlib
 import random
+from board import ResourceType
+from board import Resource
 
 
 class Player:
 
-    def __init__(self, color, ai=False) -> None:
-        self.resource_cards = []
-        self.developmentCards = []
+    def __init__(self, color) -> None:
+        self.resources = {resource: 0 for resource in ResourceType}
         self.color = color
         self.settlements = []
         self.cities = []
+        self.developmentCards = []
         self.victory_points = 0
-        self.ai = ai  # boolean
         # might be better to do class inheritance
 
     def getAllPossibleActions(self):
@@ -89,4 +90,8 @@ class AI_player(Player):
 
 
 class Human_Player(Player):
+    pass
+
+
+class Random_Player(Player):
     pass

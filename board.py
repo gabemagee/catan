@@ -1,6 +1,7 @@
 import random
 from enum import Enum
-
+from typing import Dict
+from typing import Optional
 import hexlib
 
 
@@ -22,6 +23,21 @@ class ResourceType(Enum):
     WOOD = 5
 
 
+class Resource:
+
+    def __init__(self, resource_type: ResourceType, quantity: int = 0):
+        self.resource_type = resource_type
+        self.quantity = quantity
+
+    def increment(self, amount: int = 1) -> None:
+        self.quantity = self.quantity + amount
+
+    def decrement(self, amount: int = 1) -> None:
+        if self.quantity < amount:
+            raise ValueError("You don't have enough resources")
+        self.quantity = self.quantity - amount
+
+
 # Possible Resources for a 19 tile game
 RESOURCES = [ResourceType.DESERT] + [ResourceType.CLAY] * 3 + [ResourceType.ORE] * 3 + [ResourceType.SHEEP] * 4 + [
     ResourceType.WHEAT] * 4 + [ResourceType.WOOD] * 4
@@ -38,10 +54,15 @@ class Tile:
         self.hex = hex
         self.numeral = numeral
 
-    def getNeighbors(self):
-        pass
+    def get_neighbors(self, board):
+        neighbors = []
+        for i in range(6):
+            neighbor = board.get_tile_by_hex(hexlib.hex_neighbor(self.hex, i))
+            if neighbor is not None:
+                neighbors.append(neighbor)
+        return neighbors
 
-    def getSettlements(self):
+    def getSettlements(self, board):
         pass
 
     def getCities(self):
@@ -49,19 +70,24 @@ class Tile:
 
 
 class Board:
+    tiles_by_numeral: Dict[int, Tile]
+    tiles: Dict[int, Dict[int, Dict[int, Tile]]]
+    diameter: int
+    side_length: int
+    max_factor: int
 
     def __init__(self):
         # 19 tile game
         self.diameter = 5
         self.side_length = 3
         self.max_factor = self.side_length - 1
+        self.populate_tiles()
 
+    def populate_tiles(self):
         available_resources = RESOURCES.copy()
         numerals = NUMERALS.copy()
-
         random.shuffle(available_resources)
         random.shuffle(numerals)
-
         tiles = {}
         tiles_by_numeral = {}
         for q in range(-self.max_factor, self.max_factor):
@@ -81,11 +107,14 @@ class Board:
 
     def get_all_tiles_with_numeral(self, numeral: int):
         if numeral < 2 or numeral > 12 or numeral == 7:
-            raise Exception
+            raise ValueError("Not a valid numeral")
         return self.tiles_by_numeral[numeral]
 
-    def get_tile_by_hex(self, hex: hexlib.Hex) -> Tile:
-        return self.tiles[hex.q][hex.r][hex.s]
+    def get_tile_by_hex(self, hex: hexlib.Hex) -> Optional[Tile]:
+        try:
+            return self.tiles[hex.q][hex.r][hex.s]
+        except KeyError:
+            return None
 
     class City:
 
@@ -104,10 +133,21 @@ class Board:
         def __init__(self, border) -> None:
             pass
 
-    class Port:
+    class Harbor:
 
-        def __init__(self, tileA, tileB) -> None:
-            pass
+        class HarborType(Enum):
+            WILDCARD = 0
+            CLAY = 1
+            ORE = 2
+            SHEEP = 3
+            WHEAT = 4
+            WOOD = 5
+
+        def __init__(self, location, harbor_type: HarborType) -> None:
+            self.location = location
+            self.harbor_type = harbor_type
+
+
 
     class Bandit:
 
