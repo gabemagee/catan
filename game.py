@@ -8,17 +8,18 @@ from player import Player
 BOARD_WIDTH = 5
 MAX_NUM_PLAYERS = 4
 
+
 class Game():
 
-    def __init__(self, players : List[Player]) -> None:
-        self.players = players 
+    def __init__(self, players: List[Player]) -> None:
+        self.players = players
         self.firstPlayerIndex = players.index(self.determineFirstPlayer(players))
         self.board = Board()
-        self.desert = None #TODO
+        self.desert = None  # TODO
         self.bandit = Game.Bandit(self.desert)
         print(self.turnCycle())
 
-    def turnCycle(self):    
+    def turnCycle(self):
         turn = self.takeTurn(self.players[self.firstPlayerIndex])
         nextPlayerIndex = (self.firstPlayerIndex + 1) % len(self.players)
         # while turn:
@@ -26,11 +27,10 @@ class Game():
         #     nextPlayerIndex = (nextPlayerIndex + 1) % len(self.players)
         return (nextPlayerIndex - 1) % len(self.players)
 
-
-    def rollDice(self, num_dice = 2, faces = 6):
+    def rollDice(self, num_dice=2, faces=6):
         # Non-deterministic
         sum = 0
-        for i in range(0,num_dice):
+        for i in range(0, num_dice):
             sum += random.randint(1, faces)
         return sum
 
@@ -48,22 +48,22 @@ class Game():
             elif res == highRoll:
                 leader = leader + [player]
         return Game.determineFirstPlayer(self, leader)
-            
-    def takeTurn(self, player : Player):
-        #non-deterministic
-        #reveal knights
+
+    def takeTurn(self, player: Player):
+        # non-deterministic
+        # reveal knights
         if player.revealKnightsChoice():
             self.banditAttack(player, False)
-        #roll dice
+        # roll dice
         val = self.rollDice()
         if val == 7:
             self.banditDiscard()
             self.banditAttack(player)
         else:
             for tile in self.board.get_all_tiles_with_numeral(val):
-                pass #TODO: give player resources
-        #build or buy
-        return self.isWon()# return True if game was won?
+                pass  # TODO: give player resources
+        # build or buy
+        return self.isWon()  # return True if game was won?
 
     def banditDiscard(self):
         for player in self.players:
@@ -73,9 +73,7 @@ class Game():
     def placeBandit(self, activePlayer, tile):
         pass
 
-    
-
-    def banditAttack(self, activePlayer : Player, rolled=True):
+    def banditAttack(self, activePlayer: Player, rolled=True):
         tile = activePlayer.banditTileChoice()
         self.placeBandit(activePlayer, tile)
         pass
@@ -109,15 +107,15 @@ class Game():
         def draw(self):
             return self.cards.pop()
 
-
-
     class DevelopmentType(Enum):
         pass
 
+
 def main():
     players = []
-    for color in ["a","b", "c", "d"]:
+    for color in ["a", "b", "c", "d"]:
         players.append(Player(color))
     G = Game(players)
+
 
 main()

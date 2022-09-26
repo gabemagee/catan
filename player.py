@@ -3,24 +3,23 @@ from enum import Enum
 import hexlib
 import random
 
-class Player():
 
-    def __init__(self, color, ai = False) -> None:
+class Player:
+
+    def __init__(self, color, ai=False) -> None:
         self.resource_cards = []
         self.developmentCards = []
         self.color = color
         self.settlements = []
         self.cities = []
         self.victory_points = 0
-        self.ai = ai #boolean
-        #might be better to do class inheritance
+        self.ai = ai  # boolean
+        # might be better to do class inheritance
 
-
-    def getAllPossibleActions():
+    def getAllPossibleActions(self):
         pass
 
-
-    #returns boolean
+    # returns boolean
 
     def revealKnightsChoice(self):
         pass
@@ -37,13 +36,13 @@ class Player():
     def buildCityChoice(self):
         pass
 
-    def bBuildSettlementChoice(self,):
+    def bBuildSettlementChoice(self, ):
         pass
 
     def buildRoadChoice(self):
         pass
 
-    #returns location
+    # returns location
 
     def whereToPlaceBandit(self):
         pass
@@ -51,36 +50,43 @@ class Player():
     def whereToBuildCity(self):
         pass
 
-    def whereToBuildSettlement(self,):
+    def whereToBuildSettlement(self, ):
         pass
 
     def whereToBuildRoad(self):
         pass
-    
-    #complicated choices
-    
+
+    # complicated choices
+
     def fourForOneTradeChoice(self, resourceA):
-        pass #return resource that you want
+        pass  # return resource that you want
 
     def portTradeChoice(self, port):
-        pass #return resource you want
+        pass  # return resource you want
 
     def whichDevToRevealChoice(self):
-        pass # return dev card
+        pass  # return dev card
 
     def whichPlayerToTrade(self):
-        pass #return player
+        pass  # return player
 
-
-    #actions
+    # actions
 
     def discard_choice(self, number_of_cards_to_discard):
         pass
 
     def proposePlayerTrade(self, otherPlayer, tradeA, tradeB):
-         otherPlayer.receiveTrade(tradeA, tradeB) 
+        otherPlayer.receiveTrade(tradeA, tradeB)
 
-    #helper
-    
+        # helper
+
     def add_victory_points(self):
         self.victory_points = self.victory_points + 1
+
+
+class AI_player(Player):
+    pass
+
+
+class Human_Player(Player):
+    pass
