@@ -6,7 +6,7 @@ from board import Board
 from player import Player
 
 
-class Game():
+class Game:
 
     def __init__(self, players: List[Player]) -> None:
         self.players = players
@@ -58,9 +58,13 @@ class Game():
             self.banditAttack(player)
         else:
             for tile in self.board.get_tiles_with_numeral(val):
-                resource = tile.resource
-                for city in tile.get_cities():
-                    city.
+                for city in self.board.cities:
+                    if city.is_touching_tile(tile):
+                        city.player[tile.resource] += 2
+                for settlement in self.board.settlements:
+                    if settlement.is_touching_tile(tile):
+                        settlement.player[tile.resource] +=1
+
         # build or buy
         return self.isWon()  # return True if game was won?
 
