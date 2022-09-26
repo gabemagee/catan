@@ -115,7 +115,7 @@ class Bandit:
 
 
 class Board:
-    tiles_by_numeral: Dict[int, Tile]
+    tiles_by_numeral: Dict[int, Sequence[Tile]]
     tiles: Dict[int, Dict[int, Dict[int, Tile]]]
     diameter: int
     side_length: int
@@ -174,4 +174,12 @@ class Board:
         self.settlements.remove(settlement)
         del settlement
         return city
-
+    
+    def distribute_resources_from_die_roll(self, numeral):
+        for tile in self.get_tiles_with_numeral(numeral):
+            for city in self.cities:
+                if city.is_touching_tile(tile):
+                    city.player[tile.resource] += 2
+            for settlement in self.settlements:
+                if settlement.is_touching_tile(tile):
+                    settlement.player[tile.resource] += 1

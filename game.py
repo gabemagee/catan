@@ -1,8 +1,10 @@
 import math
+import random
 from enum import Enum
 from typing import List
-import random
+
 from board import Board
+from board import Tile
 from player import Player
 
 
@@ -46,26 +48,21 @@ class Game:
                 leader = leader + [player]
         return Game.determine_first_player(self, leader)
 
-    def takeTurn(self, player: Player):
-        # non-deterministic
+    def take_turn(self, active_player: Player):
         # reveal knights
-        if player.revealKnightsChoice():
-            self.banditAttack(player, False)
+        if active_player.revealKnightsChoice():
+            self.banditAttack(active_player, False)
         # roll dice
         val = self.rollDice()
         if val == 7:
             self.banditDiscard()
-            self.banditAttack(player)
+            self.banditAttack(active_player)
         else:
-            for tile in self.board.get_tiles_with_numeral(val):
-                for city in self.board.cities:
-                    if city.is_touching_tile(tile):
-                        city.player[tile.resource] += 2
-                for settlement in self.board.settlements:
-                    if settlement.is_touching_tile(tile):
-                        settlement.player[tile.resource] +=1
-
-        # build or buy
+            self.board.distribute_resources_from_die_roll(numeral=val)
+        # trading step
+        active_player.trade_step()
+        # building and buying step
+        active_player.build_or_buy_step()
         return self.isWon()  # return True if game was won?
 
     def banditDiscard(self):
@@ -73,12 +70,16 @@ class Game:
             if player.total_number_of_resources > 7:
                 player.discard_choice(math.ceil(player.total_number_of_resources / 2))
 
-    def placeBandit(self, activePlayer, tile):
+    def placeBandit(self, activePlayer, tile: Tile):
+        players = list(
+            set([city.player for city in tile.cities] + [settlement.player for settlement in tile.settlements])
+        )
+        # have active player decide on which player to pick resource from
         pass
 
-    def banditAttack(self, activePlayer: Player, rolled=True):
-        tile = activePlayer.banditTileChoice()
-        self.placeBandit(activePlayer, tile)
+    def banditAttack(self, active_player: Player, rolled=True):
+        tile = active_player.banditTileChoice()
+        self.placeBandit(active_player, tile)
         pass
 
     def isWon(self):

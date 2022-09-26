@@ -20,6 +20,12 @@ class Player:
             count = count + self.resources[resource_type]
         return count
 
+    def build_or_buy_step(self):
+        pass
+
+    def trade_step(self):
+        pass
+
     def getAllPossibleActions(self):
         pass
 
