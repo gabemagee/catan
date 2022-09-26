@@ -9,7 +9,7 @@ from player import Player
 
 BOARD_WIDTH = 5
 MAX_NUM_PLAYERS = 4
-    
+
 class Game():
 
     def __init__(self, players : List[Player]) -> None:
@@ -62,7 +62,7 @@ class Game():
             self.banditDiscard()
             self.banditAttack(player)
         else:
-            for tile in self.board.getAllTilesWithNumeral(val):
+            for tile in self.board.get_all_tiles_with_numeral(val):
                 pass #TODO: give player resources
         #build or buy
         return self.isWon()# return True if game was won?
@@ -111,13 +111,7 @@ class Game():
         def draw(self):
             return self.cards.pop()
 
-    class ResourceType(Enum):
-        DESERT=0
-        CLAY=1
-        ORE=2
-        SHEEP=3
-        WHEAT=4
-        WOOD=5
+
 
     class DevelopmentType(Enum):
         pass

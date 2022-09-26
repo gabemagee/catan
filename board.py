@@ -3,111 +3,116 @@ import os
 from enum import Enum
 import hexlib
 import random
+from typing import Optional
+from abc import ABC, abstractmethod
+
 
 class Direction(Enum):
-    RIGHT=0
-    UPPER_RIGHT=1
-    UPPER_LEFT=2
-    LEFT=3
-    LOWER_LEFT=4
-    LOWER_RIGHT=5
+    RIGHT = 0
+    UPPER_RIGHT = 1
+    UPPER_LEFT = 2
+    LEFT = 3
+    LOWER_LEFT = 4
+    LOWER_RIGHT = 5
 
-class Board():
 
-        def __init__(self, diameter = 5):
-            self.diameter = diameter
+class ResourceType(Enum):
+    DESERT = 0
+    CLAY = 1
+    ORE = 2
+    SHEEP = 3
+    WHEAT = 4
+    WOOD = 5
 
-        def getAllTilesWithNumeral(self, numeral):
-            return []
 
-        def getTileByHex(self, hex):
-            return None
-        
-        class Grid():
+# Possible Resources for a 19 tile game
+RESOURCES = [ResourceType.DESERT] + [ResourceType.CLAY] * 3 + [ResourceType.ORE] * 3 + [ResourceType.SHEEP] * 4 + [
+    ResourceType.WHEAT] * 4 + [ResourceType.WOOD] * 4
+NUMERALS = [2, 3, 3, 4, 4, 5, 5, 6, 6, 8, 8, 9, 9, 10, 10, 11, 11, 12]
 
-            def __init__(self, diameter):
-                self.diameter = diameter
-                self.hexes = {{{}}}
-                min = -(round(diameter / 2))
-                max = math.ceil(diameter / 2)
-                for i in range(min, max):
-                    for j in range(min, max):
-                        for k in range(min, max):
-                            self.hexes[i][j][k] = self.Hex(i,j,k)
 
-            def get_hex(self, x, y, z):
-                return self.hexes[x][y][z] 
+class Tile:
+    resource: ResourceType
+    hex: hexlib.Hex
+    numeral: int
 
-            class Hex():
+    def __init__(self, resource: ResourceType, hex: hexlib.Hex, numeral: int):
+        self.resource: ResourceType = resource
+        self.hex = hex
+        self.numeral = numeral
 
-                def __init__(self, x, y, z):
-                    self.hex = hexlib.Hex(x,y,z)
+    def getNeighbors(self):
+        pass
 
-                def getX(self):
-                    return self.hex.q
+    def getSettlements(self):
+        pass
 
-                def getY(self):
-                    return self.hex.r
+    def getCities(self):
+        pass
 
-                def getZ(self):
-                    return self.hex.s
 
-                def get_neighbor(self, direction: Direction):
-                    assert (direction.value < 6 and direction.value > -1)
-                    return hexlib.hex_neighbor(self.hex, direction.value)
+class Board:
 
-                def is_neighbor(self, otherHex):
-                    return hexlib.is_neighbor(self.hex, otherHex.hex) != -1
+    def __init__(self):
+        # 19 tile game
+        self.diameter = 5
+        self.side_length = 3
+        self.max_factor = self.side_length - 1
 
-            class Vertex():
+        available_resources = RESOURCES.copy()
+        numerals = NUMERALS.copy()
 
-                def __init__(self, hex_a, hex_b, hex_c) -> None:
-                    self.hexes = [hex_a, hex_b, hex_c]
+        random.shuffle(available_resources)
+        random.shuffle(numerals)
 
-            class Border():
+        tiles = {}
+        tiles_by_numeral = {}
+        for q in range(-self.max_factor, self.max_factor):
+            tiles[q] = {}
+            for r in range(-self.max_factor, self.max_factor):
+                tiles[q][r] = {}
+                for s in range(-self.max_factor, self.max_factor):
+                    resource = available_resources.pop()
+                    numeral = 0
+                    if resource != ResourceType.DESERT:
+                        numeral = numerals.pop()
+                    tile = Tile(resource, hexlib.Hex(q, r, s), numeral)
+                    tiles[q][r][s] = tile
+                    tiles_by_numeral[numeral] = tiles_by_numeral.get(numeral, []) + [tile]
+        self.tiles = tiles
+        self.tiles_by_numeral = tiles_by_numeral
 
-                def __init__(self, hex_a, hex_b) -> None:
-                    self.hexes = [hex_a, hex_b]
+    def get_all_tiles_with_numeral(self, numeral: int):
+        if numeral < 2 or numeral > 12 or numeral == 7:
+            raise Exception
+        return self.tiles_by_numeral[numeral]
 
-        class Tile():
+    def get_tile_by_hex(self, hex: hexlib.Hex) -> Tile:
+        return self.tiles[hex.q][hex.r][hex.s]
 
-            def __init__(self, resourceType, hex, numeral):
-                self.resourceType = resourceType
-                self.hex = hex
-                self.numeral = numeral
+    class City:
 
-            def getNeighbors(self):
-                pass
+        def __init__(self, vertex, player):
+            self.vertex = vertex
+            self.player = player
 
-            def getSettlements(self):
-                pass
+    class Settlement:
 
-            def getCities(self):
-                pass
+        def __init__(self, vertex, player):
+            self.vertex = vertex
+            self.player = player
 
-        class City():
+    class Road:
 
-            def __init__(self, vertex, player):
-                self.vertex = vertex
-                self.player = player
+        def __init__(self, border) -> None:
+            pass
 
-        class Settlement():
+    class Port:
 
-            def __init__(self, vertex, player):
-                self.vertex = vertex
-                self.player = player
+        def __init__(self, tileA, tileB) -> None:
+            pass
 
-        class Road():
+    class Bandit:
 
-            def __init__(self, border) -> None:
-                pass    
-
-        class Port():
-
-            def __init__(self, tileA, tileB) -> None:
-                pass 
-        
-        class Bandit():
-
-            def __init__(self) -> None:
-                pass
+        def __init__(self) -> None:
+            pass
