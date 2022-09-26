@@ -5,15 +5,12 @@ import random
 from board import Board
 from player import Player
 
-BOARD_WIDTH = 5
-MAX_NUM_PLAYERS = 4
-
 
 class Game():
 
     def __init__(self, players: List[Player]) -> None:
         self.players = players
-        self.firstPlayerIndex = players.index(self.determineFirstPlayer(players))
+        self.firstPlayerIndex = players.index(self.determine_first_player(players))
         self.board = Board()
         self.desert = None  # TODO
         self.bandit = Game.Bandit(self.desert)
@@ -34,7 +31,7 @@ class Game():
             sum += random.randint(1, faces)
         return sum
 
-    def determineFirstPlayer(self, players):
+    def determine_first_player(self, players):
         # Non-deterministic
         if len(players) == 1:
             return players[0]
@@ -47,7 +44,7 @@ class Game():
                 leader = [player]
             elif res == highRoll:
                 leader = leader + [player]
-        return Game.determineFirstPlayer(self, leader)
+        return Game.determine_first_player(self, leader)
 
     def takeTurn(self, player: Player):
         # non-deterministic
@@ -60,15 +57,17 @@ class Game():
             self.banditDiscard()
             self.banditAttack(player)
         else:
-            for tile in self.board.get_all_tiles_with_numeral(val):
-                pass  # TODO: give player resources
+            for tile in self.board.get_tiles_with_numeral(val):
+                resource = tile.resource
+                for city in tile.get_cities():
+                    city.
         # build or buy
         return self.isWon()  # return True if game was won?
 
     def banditDiscard(self):
         for player in self.players:
-            if len(player.resource_cards) > 7:
-                player.discard_choice(math.ceil(len(player.resource_cards) / 2))
+            if player.total_number_of_resources > 7:
+                player.discard_choice(math.ceil(player.total_number_of_resources / 2))
 
     def placeBandit(self, activePlayer, tile):
         pass

@@ -1,14 +1,10 @@
-import os
-from enum import Enum
-import hexlib
-import random
 from board import ResourceType
-from board import Resource
 
 
 class Player:
 
-    def __init__(self, color) -> None:
+    def __init__(self, color, game) -> None:
+        self.game = game
         self.resources = {resource: 0 for resource in ResourceType}
         self.color = color
         self.settlements = []
@@ -17,10 +13,18 @@ class Player:
         self.victory_points = 0
         # might be better to do class inheritance
 
+    @property
+    def total_number_of_resources(self) -> int:
+        count = 0
+        for resource_type in self.resources:
+            count = count + self.resources[resource_type]
+        return count
+
     def getAllPossibleActions(self):
         pass
 
-    # returns boolean
+    def build_settlement(self, tile_one, tile_two, tile_three):
+        self.game.board
 
     def revealKnightsChoice(self):
         pass
@@ -71,6 +75,9 @@ class Player:
     def whichPlayerToTrade(self):
         pass  # return player
 
+    def banditTileChoice(self):
+        pass
+
     # actions
 
     def discard_choice(self, number_of_cards_to_discard):
@@ -85,13 +92,13 @@ class Player:
         self.victory_points = self.victory_points + 1
 
 
-class AI_player(Player):
+class AIPlayer(Player):
     pass
 
 
-class Human_Player(Player):
+class HumanPlayer(Player):
     pass
 
 
-class Random_Player(Player):
+class RandomPlayer(Player):
     pass
