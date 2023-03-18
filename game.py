@@ -1,7 +1,7 @@
 import math
 import random
 from enum import Enum
-from typing import List
+from typing import Sequence
 
 from board import Board
 from board import Tile
@@ -10,23 +10,22 @@ from player import Player
 
 class Game:
 
-    def __init__(self, players: List[Player]) -> None:
+    def __init__(self, players: Sequence[Player]) -> None:
         self.players = players
         self.firstPlayerIndex = players.index(self.determine_first_player(players))
         self.board = Board()
         self.desert = None  # TODO
         self.bandit = Game.Bandit(self.desert)
-        print(self.turnCycle())
 
-    def turnCycle(self):
+    def turn_cycle(self):
         turn = self.takeTurn(self.players[self.firstPlayerIndex])
-        nextPlayerIndex = (self.firstPlayerIndex + 1) % len(self.players)
+        next_player_index = (self.firstPlayerIndex + 1) % len(self.players)
         # while turn:
         #     turn = ! Game.takeTurn(self, self.players[nextPlayerIndex])
         #     nextPlayerIndex = (nextPlayerIndex + 1) % len(self.players)
-        return (nextPlayerIndex - 1) % len(self.players)
+        return (next_player_index - 1) % len(self.players)
 
-    def rollDice(self, num_dice=2, faces=6):
+    def roll_dice(self, num_dice=2, faces=6):
         # Non-deterministic
         sum = 0
         for i in range(0, num_dice):
@@ -40,7 +39,7 @@ class Game:
         leader = [None]
         highRoll = 1
         for player in players:
-            res = self.rollDice()
+            res = self.roll_dice()
             if res > highRoll:
                 highRoll = res
                 leader = [player]
@@ -53,7 +52,7 @@ class Game:
         if active_player.revealKnightsChoice():
             self.banditAttack(active_player, False)
         # roll dice
-        val = self.rollDice()
+        val = self.roll_dice()
         if val == 7:
             self.banditDiscard()
             self.banditAttack(active_player)
@@ -95,31 +94,39 @@ class Game:
         def move(self, dest):
             self.location = dest
 
-    class DevelopmentCard():
+    class DevelopmentCard:
+
+        def __init__(self, type) -> None:
+            self.type = type
+
+    class DevelopmentCardDeck:
 
         def __init__(self) -> None:
-            pass
+            self.cards = [Game.DevelopmentCard]
 
-    class DevelopmentCardDeck():
-
-        def __init__(self) -> None:
-            self.cards = [Game.DevelopmentCard()]
-
-        def shuffle(self):
+        def shuffle(self) -> None:
             random.shuffle(self.cards)
 
         def draw(self):
             return self.cards.pop()
 
     class DevelopmentType(Enum):
-        pass
+        KNIGHT = 0
+        ROAD_BUILDING = 1
+        YEAR_OF_PLENTY = 2
+        MONOPOLY = 3
+        VICTORY_POINT = 4
 
 
 def main():
     players = []
     for color in ["a", "b", "c", "d"]:
         players.append(Player(color))
-    G = Game(players)
+    game = Game(players)
+    game_over = False
+    while not game_over:
+        game.turn_cycle()
+        game_over = True
 
 
 main()
